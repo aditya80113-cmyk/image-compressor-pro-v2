@@ -1,136 +1,63 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>तस्वीर संकुचक Pro</title>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8586167917502878"
-     crossorigin="anonymous"></script>
-<style>
-body {
-  font-family: Arial;
-  background: linear-gradient(135deg,#6a5acd,#8a2be2);
-  color: white;
-  text-align: center;
-  padding: 20px;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Compressor Tool</title>
 
-.container {
-  background: white;
-  color: black;
-  padding: 20px;
-  border-radius: 15px;
-}
-
-button {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 10px;
-  background: purple;
-  color: white;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-button:hover {
-  transform: scale(1.1);
-}
-
-#preview {
-  max-width: 100%;
-  margin-top: 10px;
-  display: none;
-}
-
-#loader {
-  display: none;
-  font-size: 18px;
-  margin: 10px;
-}
-</style>
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+            background: #f4f4f4;
+            margin: 0;
+        }
+        nav {
+            background: #333;
+            padding: 10px;
+        }
+        nav a {
+            color: white;
+            margin: 10px;
+            text-decoration: none;
+        }
+        .box {
+            background: white;
+            margin: 20px;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background: green;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 
 <body>
-<div style="margin-bottom:10px;">
-  <a href="about.html">About</a> |
-  <a href="privacy.html">Privacy Policy</a> |
-  <a href="contact.html">Contact</a>
+
+<nav>
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+    <a href="privacy.html">Privacy</a>
+</nav>
+
+<div class="box">
+    <h1>Image Compressor Tool</h1>
+
+    <p>
+        यह एक free online tool है जिससे आप अपनी images का size कम कर सकते हैं।
+        यह fast और आसान है, और quality भी maintain करता है।
+    </p>
+
+    <input type="file">
+    <br><br>
+    <button>Compress Image</button>
 </div>
-<h2>🖼️ तस्वीर संकुचक Pro</h2>
-
-<div class="container">
-
-<input type="file" id="fileInput"><br><br>
-
-<div id="loader">⏳ Compress हो रहा है...</div>
-
-<img id="preview">
-
-<p>Original Size: <span id="originalSize">-</span></p>
-<p>Compressed Size: <span id="compressedSize">-</span></p>
-
-<br>
-
-<a id="downloadBtn" style="display:none;" download="compressed.jpg">
-  <button>Download Image</button>
-</a>
-
-<br><br>
-
-<button onclick="resetApp()">Reset</button>
-
-</div>
-
-<script>
-let compressedBlob;
-
-document.getElementById("fileInput").addEventListener("change", function(e){
-  const file = e.target.files[0];
-  if(file) compressImage(file);
-});
-
-function compressImage(file) {
-  document.getElementById("loader").style.display = "block";
-
-  const reader = new FileReader();
-  reader.readAsDataURL(file);
-
-  reader.onload = function(event) {
-    const img = new Image();
-    img.src = event.target.result;
-
-    img.onload = function() {
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-
-      canvas.width = img.width;
-      canvas.height = img.height;
-
-      ctx.drawImage(img, 0, 0);
-
-      canvas.toBlob(function(blob) {
-        compressedBlob = blob;
-
-        document.getElementById("preview").src = URL.createObjectURL(blob);
-        document.getElementById("preview").style.display = "block";
-
-        document.getElementById("downloadBtn").href = URL.createObjectURL(blob);
-        document.getElementById("downloadBtn").style.display = "block";
-
-        document.getElementById("originalSize").innerText = (file.size/1024).toFixed(2) + " KB";
-        document.getElementById("compressedSize").innerText = (blob.size/1024).toFixed(2) + " KB";
-
-        document.getElementById("loader").style.display = "none";
-
-      }, "image/jpeg", 0.7);
-    };
-  };
-}
-
-function resetApp(){
-  location.reload();
-}
-</script>
 
 </body>
 </html>
