@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🖼️ तस्वीर संकुचक Pro v3.0</title>
+    <!-- PWA Support -->
+    <link rel="manifest" href="data:application/manifest+json,{
+        'name': 'तस्वीर संकुचक Pro',
+        'short_name': 'Image Compressor',
+        'icons': [{'src': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9IiM2NjdlZWEiLz4KPHRleHQgeD0iOTYiIHk9IjExMCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjYwIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+🖼️PC90ZXh0Pgo8L3N2Zz4=', 'sizes': '192x192', 'type': 'image/svg+xml'}],
+        'theme_color': '#667eea',
+        'background_color': '#ffffff',
+        'display': 'standalone',
+        'start_url': '.'
+    }">
+    <meta name="theme-color" content="#667eea">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        body.dark {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: #ecf0f1;
+        }
+        body.dark .app { background: #34495e; color: #ecf0f1; }
+        body.dark .upload-area { background: #2c3e50; border-color: #3498db; }
+        body.dark .stats { background: #2c3e50; }
+        .app {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        h1 { 
+            color: #333; 
+            font-size: 24px;
+            margin: 0;
+            flex: 1;
+        }
+        .theme-toggle {
+            background: none;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+        .theme-toggle:hover { background: #667eea; color: white; transform: scale(1.1); }
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9ff;
+        }
+        .upload-area:hover { 
+            border-color: #764ba2; 
+            background: #f0f2ff; 
+            transform: translateY(-2px);
+        }
+        .upload-area.dragover { 
+            border-color: #28a745 !important;
+            background: #e8f5e8 !important;
+            transform: scale(1.03);
+            box-shadow: 0 10px 30px rgba(40,167,69,0.3);
+        }
+        input[type="file"] { display: none; }
+        .preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        input[type="range"] { flex: 1; min-width: 150px; }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        button:hover:not(:disabled) { transform: translateY(-2px); }
+        button:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .reset-btn {
+            background: linear-gradient(135deg, #6c757d, #495057);
+            padding: 12px 20px;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            font-weight: bold;
+            color: #666;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+        .download-link {
+            display: inline-block;
+            margin-top:
