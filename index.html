@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🖼️ तस्वीर संकुचक Pro v2.0</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .app {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+        }
+        h1 { 
+            color: #333; 
+            margin-bottom: 20px; 
+            font-size: 24px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9ff;
+            position: relative;
+            overflow: hidden;
+        }
+        .upload-area:hover { 
+            border-color: #764ba2; 
+            background: #f0f2ff; 
+            transform: translateY(-2px);
+        }
+        .upload-area.dragover { 
+            border-color: #28a745 !important; 
+            background: #e8f5e8 !important;
+            transform: scale(1.03);
+            box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);
+        }
+        input[type="file"] { display: none; }
+        .preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        input[type="range"] { 
+            flex: 1; 
+            min-width: 150px;
+        }
+        .quality-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            color: #555;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+        button:hover:not(:disabled) { 
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        button:disabled { 
+            opacity: 0.6; 
+            cursor: not-allowed; 
+            transform: none; 
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .reset-btn {
+            background: linear-gradient(135deg, #6c757d, #495057);
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            font-weight: bold;
+            color: #666;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+        .download-link {
+            display: inline-block;
+            margin-top: 20px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            padding: 15px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            color: white;
+            display: none;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 10px 25px rgba(40, 167, 69, 0.3);
+        }
+        .download-link:hover { 
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(40, 167, 69, 0.4);
+        }
+        .size { 
+            color: #764ba2; 
+            font-size: 18px; 
+            font-weight: 700;
+        }
+        .loading {
+            display: none;
+            margin: 15px 0;
+            color: #667eea;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .loading.active { display: block; }
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .error, .success {
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 12px;
+            border-left: 5px solid;
+            transition: all 0.3s;
+            display: none;
+            font-weight: 500;
+        }
+        .error {
+            color: #dc3545; 
+            background: #f8d7da; 
+            border-left-color: #dc3545;
+        }
+        .success {
+            color: #155724; 
+            background: #d4edda; 
+            border-left-color: #28a745;
+        }
+        .error.show, .success.show { display: block; }
+        .limits-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 15px;
+            background: #f0f8ff;
+            padding: 12px;
+            border-radius: 10px;
+            border-left: 3px solid #667eea;
+        }
+        @media (max-width: 480px) {
+            .app { padding: 20px; }
+            .controls, .btn-group, .stats { flex-direction: column; gap: 8px; }
+            input[type="range"] { min-width: auto; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <h1>🖼️ तस्वीर संकुचक Pro v2.0</h1>
+        
+        <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+            <div style="font-size: 18px; margin-bottom: 5px;">📁 तस्वीर यहाँ छोड्नुहोस्</div>
+            <div style="font-size: 14px; color: #666;">वा क्लिक गर्नुहोस् • JPG, PNG, WebP • अधिकतम 15MB</div>
+        </div>
+        
+        <input type="file" id="fileInput" accept="image/*">
+        
+        <img id="preview" class="preview" alt="Preview">
+        
+        <div class="controls">
+            <div class="quality-info">
+                गुणस्तर: <span id="qualityValue">80</span>%
+            </div>
+            <input type="range" id="quality" min="10" max="100" value="80">
+        </div>
+        
+        <div class="stats">
+            <div>मूल: <span id="originalSize">--</span></div>
+            <div>नयाँ: <span id="newSize">--</span></div>
+            <div class="size" id="reduction">--</div>
+        </div>
+        
+        <div class="btn-group">
+            <button id="compressBtn" onclick="compressImage()">🗜️ संकुचन गर्नुहोस्</button>
+            <button class="reset-btn" onclick="resetApp()">♻️ Reset</button>
+        </div>
+        
+        <div id="loading" class="loading">
+            <span class="spinner"></span>संकुचन भइरहेको छ...
+        </div>
+        
+        <a id="downloadLink" class="download-link">💾 डाउनलोड गर्नुहोस् (तयार!)</a>
+        
+        <div class="limits-info">
+            🚀 <strong>Pro v2.0:</strong> 100% क्लाइन्ट-साइड • Smart Compression • Auto Scroll • No Upscaling
+        </div>
+    </div>
+
+    <script>
+        // Elements cache
+        const elements = {
+            fileInput: document.getElementById('fileInput'),
+            preview: document.getElementById('preview'),
+            qualitySlider: document.getElementById('quality'),
+            qualityValue: document.getElementById('qualityValue'),
+            compressBtn: document.getElementById('compressBtn'),
+            loading: document.getElementById('loading'),
+            downloadLink: document.getElementById('downloadLink'),
+            originalSize: document.getElementById('originalSize'),
+            newSize: document.getElementById('newSize'),
+            reduction: document.getElementById('reduction')
+        };
+
+        let originalFile = null;
+        let currentBlobUrl = null;
+
+        // Quality slider update
+        elements.qualitySlider.addEventListener('input', (e) => {
+            elements.qualityValue.textContent = e.target.value;
+        });
+
+        // File input handling
+        elements.fileInput.addEventListener('change', handleFileSelect);
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/') && file.size <= 15 * 1024 * 1024) {
+                originalFile = file;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    elements.preview.src = e.target.result;
+                    elements.preview.style.display = 'block';
+                    updateOriginalSize(file.size);
+                    resetUI();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                showError('❌ कृपया 15MB भन्दा सानो JPG/PNG/WebP तस्वीर चयन गर्नुहोस्');
+                elements.fileInput.value = '';
+            }
+        }
+
+        // Drag & Drop (Enhanced)
+        const uploadArea = document.querySelector('.upload-area');
+        ['dragover', 'dragenter'].forEach(event => {
+            uploadArea.addEventListener(event, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                uploadArea.classList.add('dragover');
+            });
+        });
+
+        ['dragleave', 'dragend', 'drop'].forEach(event => {
+            uploadArea.addEventListener(event, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                uploadArea.classList.remove('dragover');
+            });
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                elements.fileInput.files = e.dataTransfer.files;
+                handleFileSelect({ target: { files: e.dataTransfer.files } });
+            }
+        });
+
+        function updateOriginalSize(size) {
+            elements.originalSize.textContent = formatSize(size);
+        }
+
+        function formatSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const sizes = ['B', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(1024));
+            return (bytes / Math.pow(1024, i)).toFixed(1) + ' ' + sizes[i];
+        }
+
+        async function compressImage() {
+            if (!originalFile) {
+                showError('❌ कृपया पहिले तस्वीर चयन गर्नुहोस्');
+                return;
+            }
+
+            // Button loading state
+            elements.compressBtn.disabled = true;
+            elements.compressBtn.innerHTML = '<span class="spinner"></span>Processing...';
+            elements.loading.classList.add('active');
+            elements.downloadLink.style.display = 'none';
+            hideMessages();
+
+            try {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                
+                await new Promise((resolve, reject) => {
+                    img.onload = () => resolve();
+                    img.onerror = reject;
+                    img.src = elements.preview.src;
+                });
+
+                // ✅ IMPROVEMENT 3: Prevent Upscaling + Smart Resize
+                const maxWidth = 1920;
+                const ratio = Math.min(maxWidth / img.width, maxWidth / img.height, 1);
+                const width = img.width * ratio;
+                const height = img.height * ratio;
+
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // ✅ IMPROVEMENT 4: Smart Quality Control
+                let quality = parseInt(elements.qualitySlider.value) / 100;
+                if (originalFile.size > 5 * 1024 * 1024) {
+                    quality = Math.min(quality, 0.75); // Auto reduce for large files
+                }
+
+                canvas.toBlob((blob) => {
+                    // Cleanup old blob
+                    cleanupBlob();
+                    
+                    const newSizeKB = blob.size;
+                    elements.newSize.textContent = formatSize(newSizeKB);
+                    
+                    const percent = ((1 - blob.size / originalFile.size) * 100).toFixed(1);
+                    elements.reduction.textContent = `${percent}% सानो`;
+                    
+                    // Create download link
+                    currentBlobUrl = URL.createObjectURL(blob);
+                    elements.downloadLink.href = currentBlobUrl;
+                    elements.downloadLink.download = `compressed-${Date.now()}.jpg`;
+                    elements.downloadLink.style.display = 'inline-block';
+                    
+                    // ✅ IMPROVEMENT 1: Auto Scroll to Download
+                    elements.downloadLink.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'center' 
+                    });
+                    
+                    showSuccess(`✅ सफल! ${percent}% (${formatSize(newSizeKB)}) मा संकुचित`);
+                    
+                    // Reset button
+                    elements.compressBtn.disabled = false;
+                    elements.compressBtn.innerHTML = '🔄 फेरि संकुचन गर्नुहोस्';
+                    elements.loading.classList.remove('active');
+                    
+                }, 'image/jpeg', quality);
+
+            } catch (error) {
+                console.error('Compression error:', error);
+                showError('❌ संकुचनमा समस्या भयो। फेरि कोशिस गर्नुहोस्');
+                resetButtonState();
+            }
+        }
+
+        function resetApp() {
+            originalFile = null;
+            cleanupBlob();
+            elements.preview.style.display = 'none';
+            elements.downloadLink.style.display = 'none';
+            elements.originalSize.textContent = '--';
+            elements.newSize.textContent = '--';
+            elements.reduction.textContent = '--';
+            elements.fileInput.value = '';
+            elements.qualitySlider.value = 80;
+            elements.qualityValue.textContent = '80';
+            hideMessages();
+            resetButtonState();
+        }
+
+        function resetButtonState() {
+            elements.compressBtn.disabled = false;
+            elements.compressBtn.innerHTML = '🗜️ संकुचन गर्नुहोस्';
+            elements.loading.classList.remove('active');
+        }
+
+        function cleanupBlob() {
+            if (currentBlobUrl) {
+                URL.revokeObjectURL(currentBlobUrl);
+                currentBlobUrl = null;
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error show';
+            errorDiv.textContent = message;
+            document.querySelector('.app').insertBefore(errorDiv, uploadArea);
+            setTimeout(() => errorDiv.remove(), 5000);
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success show';
+            successDiv.textContent = message;
+            document.querySelector('.app').insertBefore(successDiv, uploadArea);
+            setTimeout(() => successDiv.remove(), 5000);
+        }
+
+        function hideMessages() {
+            document.querySelectorAll('.error, .success').forEach(el => el.remove());
+        }
+
+        function resetUI() {
+            elements.downloadLink.style.display = 'none';
+            elements.newSize.textContent = '--';
+            elements.reduction.textContent = '--';
+            hideMessages();
+            resetButtonState();
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && originalFile) {
+                compressImage();
+            } else if (e.key === 'Escape') {
+                resetApp();
+            }
+        });
+    </script>
+</body>
+</html>
